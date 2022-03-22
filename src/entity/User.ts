@@ -15,12 +15,11 @@ export class User {
   @Column()
   lastName!: string
 
-  @ManyToMany(() => Skill, { cascade: true})
+  @ManyToMany(() => Skill, skill => skill.users)
   @JoinTable()
   skills!: Skill[]
 
-  @ManyToMany(() => Project)
-  @JoinTable()
+  @ManyToMany(() => Project, project => project.participants)
   projects!: Project[]
 
   constructor(properties: Partial<User>) {

@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, JoinTable, ManyToMany } from "typeorm"
-import { Exclude, plainToClass } from "class-transformer"
+import { plainToClass } from "class-transformer"
 import { User } from "./User"
+import { Project } from "./Project"
 
 @Entity()
 export class Skill {
@@ -12,8 +13,10 @@ export class Skill {
   label!: string
 
   @ManyToMany(() => User)
-  @JoinTable()
   users!: User
+
+  @ManyToMany(() => Project, project => project.requiredSkills)
+  projects: Project[]
 
   constructor(properties: Partial<Skill>) {
     return plainToClass(Skill, properties)

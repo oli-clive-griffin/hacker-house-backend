@@ -18,15 +18,15 @@ export class Project {
   @Column()
   description!: string
 
-  @ManyToMany(() => Skill, { cascade: true})
+  @ManyToMany(() => Skill, skill => skill.projects, { cascade: true})
   @JoinTable()
   requiredSkills!: Skill[]
 
-  @ManyToMany(() => User, { cascade: true})
+  @ManyToMany(() => User, user => user.projects, { cascade: true})
   @JoinTable()
   participants!: User[]
 
-  @ManyToMany(() => Tag, { cascade: true})
+  @ManyToMany(() => Tag, tag => tag.projects, { cascade: true })
   @JoinTable()
   tags!: Tag[]
 
