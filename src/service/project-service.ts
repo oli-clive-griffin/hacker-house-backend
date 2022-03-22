@@ -1,9 +1,6 @@
-import { profileEnd } from "console"
 import { RequestHandler } from "express"
-import { getRepository } from "typeorm"
 import { AppDataSource } from "../data-source"
 import { NewProject, Project } from "../entity/Project"
-import { User } from "../entity/User"
 
 AppDataSource.initialize()
   .then(() => console.log("Data Source has been initialized!"))
@@ -29,6 +26,17 @@ export const getProjects: RequestHandler = async (req, res) => {
   try {
     const projects = await projectRepository.find()
     res.status(200).json(projects)
+  } catch (e) {
+    console.log(e)
+    res.json({ error: 'something went wrong' })
+  }
+}
+
+export const deleteProject: RequestHandler = async (req, res) => {
+  try {
+    const project = await projectRepository.findOne({ where: { id: req.params.id }})
+    projectRepository.delete({ id: project.id })
+    res.status(200).json(project)
   } catch (e) {
     console.log(e)
     res.json({ error: 'something went wrong' })
