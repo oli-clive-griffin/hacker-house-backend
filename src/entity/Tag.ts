@@ -1,8 +1,6 @@
-import { plainToClass } from "class-transformer"
+import { plainToInstance } from "class-transformer"
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from "typeorm"
 import { Project } from "./Project"
-
-export type NewTag = { label: string }
 
 @Entity()
 export class Tag {
@@ -16,8 +14,8 @@ export class Tag {
   @ManyToMany(() => Project, project => project.tags)
   projects: Project[]
 
-  constructor(properties: NewTag) {
-    return plainToClass(Tag, properties)
+  constructor(properties: Partial<Tag>) {
+    return plainToInstance(Tag, properties)
   }
 
 }

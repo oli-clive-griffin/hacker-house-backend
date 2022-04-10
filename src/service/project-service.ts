@@ -1,13 +1,33 @@
 import { RequestHandler } from "express"
 import { In, Repository } from "typeorm"
 import { NewProject, Project } from "../entity/Project"
+import { Tag } from "../entity/Tag"
+import { User } from "../entity/User"
 
-export const makeCreateProject = (projectRepository: Repository<Project>): RequestHandler => async (req, res) => {
-  const _newProject = req.body as NewProject
+type CreateProjectDTO = {
+  title: string
+  description: string
+  tags: string[]
+  participantIds: string[]
+}
+
+export const makeCreateProject = (
+  projectRepository: Repository<Project>,
+  userRepository: Repository<User>,
+): RequestHandler => async (req, res) => {
+  const createProjectDto = req.body as CreateProjectDTO
+  const users = await userRepository.find({ where: { id: In(createProjectDto.participantIds) } })
+
+  const newProjectProps: NewProject = {
+    ...createProjectDto,
+    participants: users,
+    requiredSkills: [],
+    tags: createProjectDto.tags.map(label => new Tag({ label })),
+  }
 
   try {
-    const _project = new Project(_newProject)
-    const saved = await projectRepository.save(_project)
+    const project = new Project(newProjectProps)
+    const saved = await projectRepository.save(project)
     console.log(saved)
     res.status(201).json(saved)
   } catch (e) {

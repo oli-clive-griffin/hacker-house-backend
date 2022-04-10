@@ -1,7 +1,9 @@
-import { plainToClass } from "class-transformer"
+import { plainToInstance } from "class-transformer"
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from "typeorm"
 import { Project } from "./Project"
 import { Skill } from "./Skill"
+
+export type NewUser = Partial<User> & Pick<User, 'email' | 'passwordHash'>
 
 @Entity()
 export class User {
@@ -12,8 +14,14 @@ export class User {
   @Column()
   firstName!: string
 
+  @Column({ nullable: true })
+  lastName?: string
+
   @Column()
-  lastName!: string
+  email!: string
+
+  @Column()
+  passwordHash!: string
 
   @ManyToMany(() => Skill, skill => skill.users)
   @JoinTable()
@@ -22,8 +30,8 @@ export class User {
   @ManyToMany(() => Project, project => project.participants)
   projects!: Project[]
 
-  constructor(properties: Partial<User>) {
-    return plainToClass(User, properties)
+  constructor(properties: NewUser) {
+    return plainToInstance(User, properties)
   }
 
 }

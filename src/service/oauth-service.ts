@@ -1,17 +1,16 @@
 import axios from "axios";
 import { RequestHandler } from "express";
+import { config } from "./config-service";
+
+type GHResponse = { access_token: string; token_type: string; scope: string, error?: any }
 
 export const authGithub: RequestHandler = async (req, res) => {
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
-  if (clientId == null || clientSecret == null) throw new Error('not coorect env vars')
-
   try {
-    const axiosRes = await axios.post(
+    const axiosRes = await axios.post<GHResponse>(
       "https://github.com/login/oauth/access_token",
       {
-        client_id: clientId,
-        client_secret: clientSecret,
+        configService: config.CLIENT_ID,
+        client_secret: config.CLIENT_SECRET,
         code: req.query.code
       },
       {
@@ -25,7 +24,6 @@ export const authGithub: RequestHandler = async (req, res) => {
     console.log(axiosRes.data)
 
     res.json(axiosRes.data)
-
   } catch (e) {
     console.log(e)
     res.status(401).send('problem')

@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, BaseEntity } from "typeorm"
-import { plainToClass } from 'class-transformer'
+import { plainToInstance } from 'class-transformer'
 import { User } from "./User"
 import { Tag } from "./Tag"
 import { Skill } from "./Skill"
@@ -31,7 +31,7 @@ export class Project {
   tags!: Tag[]
 
   constructor(properties: NewProject) {
-    return plainToClass(Project, properties)
+    return plainToInstance(Project, properties)
   }
 
 }

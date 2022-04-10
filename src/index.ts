@@ -3,37 +3,37 @@ import cors from 'cors'
 import { json } from 'body-parser'
 import "reflect-metadata";
 import { makeCreateProject, makeDeleteAll, makeDeleteProject, makeGetProjects } from './service/project-service';
-import { authGithub } from './service/oauth-service';
 import dotenv from 'dotenv'
 import { AppDataSource } from './data-source';
 import { Project } from './entity/Project';
-
-dotenv.config()
-
-const PORT = process.env.PORT || 5000
+import { authGithub } from './service/oauth-service';
+import { User } from './entity/User';
+import { makeLogIn, makeSignUp } from './service/auth-service';
+import { config } from './service/config-service';
 
 AppDataSource.initialize()
   .then(() => console.log("Data Source has been initialized!"))
   .catch((err) => console.error("Error during Data Source initialization:", err))
 
 const projectRepository = AppDataSource.getRepository(Project)
+const userRepository = AppDataSource.getRepository(User)
 
-const main = async () => {
-  const app = express()
-  app.use(cors())
-  app.use(json())
+const app = express()
+app.use(cors())
+app.use(json())
 
-  app.get('/api/projects', makeGetProjects(projectRepository))
-  app.post('/api/projects', makeCreateProject(projectRepository))
-  app.delete('/api/projects/all', makeDeleteAll(projectRepository))
-  app.delete('/api/projects/:id', makeDeleteProject(projectRepository))
+// Projects
+app.get('/api/projects', makeGetProjects(projectRepository))
+app.post('/api/projects', makeCreateProject(projectRepository, userRepository))
+app.delete('/api/projects/all', makeDeleteAll(projectRepository))
+app.delete('/api/projects/:id', makeDeleteProject(projectRepository))
 
-  app.get('/auth/github', authGithub)
+// Auth
+app.post('/api/signup', makeSignUp(userRepository))
+app.post('/api/login', makeLogIn(userRepository))
 
-  app.listen(PORT, () => {
-    console.log(`\n\n\n-- listening on port ${PORT} --`)
-  })
+app.get('/auth/github', authGithub)
 
-}
-
-main()
+app.listen(config.PORT, () => {
+  console.log(`\n\n\n-- listening on port ${config.PORT} --`)
+})
